@@ -1,7 +1,11 @@
 "use client"
+import { useEffect } from "react";
+import { ApolloProvider } from '@apollo/client';
+import client from "@/lib/apolloClient";
+
 import ContentBlock from "@/components/contentBlock";
 import { Button } from "@/components/ui/button";
-import { useEffect } from "react";
+import ShopProdactsList from "@/components/shopProdactsList";
 
 const categories = [
   {name: 'drugs'},
@@ -25,47 +29,35 @@ export default function Home() {
 
   return (
     <div className="flex flex-row p-5 gap-5 flex-nowrap h-15/16 w-full">
-      <ContentBlock className="basis-1/4 grow h-full flex flex-col flex-wrap gap-5 p-5">
-        <span className="text-center">Shops:</span>
-        <ul className="flex flex-col gap-5 flex-wrap justify-center">
-          {categories.map((element, index) => {
-              return(
-                <li>
-                  <Button asChild
-                    key={index}
-                    variant="destructive"
-                    size="lg"
-                    className="w-full">
-                        <p>{element.name}</p>
-                  </Button>
-                </li>
-              )
-          })}
-        </ul>
-      </ContentBlock>
-      <ContentBlock className="basis-3/4 grow h-full overflow-y-scroll">
-        <ul className="flex flex-wrap flex-row justify-between">
-          {productsList.map((element, index) => {
-              return(
-                <li className="basis-1/3 p-5 flex justify-center "
-                    key={index}>
-                    <div className="bg-secondary p-5 w-fit min-w-80 h-fit min-h-80">
-                      <div className="w-full min-h-60 bg-muted-foreground mb-5"></div>
-                      <div className="flex gap-5 items-center h-1/3">
-                        <div className="basis-2/3 text-primary">{element.name}</div>
-                        <div className="basis-1/3">
-                          <Button variant="destructive"
-                                  size="sm">
-                              add to cart
-                          </Button>
+      <ApolloProvider client={client}>
+        <ContentBlock className="basis-1/4 grow h-full flex flex-col flex-wrap gap-5 p-5">
+          <span className="text-center">Shops:</span>
+          <ShopProdactsList/>
+        </ContentBlock>
+        <ContentBlock className="basis-3/4 grow h-full overflow-y-scroll">
+          <ul className="flex flex-wrap flex-row justify-between">
+            {productsList.map((element, index) => {
+                return(
+                  <li className="basis-1/3 p-5 flex justify-center "
+                      key={index}>
+                      <div className="bg-secondary p-5 w-fit min-w-80 h-fit min-h-80">
+                        <div className="w-full min-h-60 bg-muted-foreground mb-5"></div>
+                        <div className="flex gap-5 items-center h-1/3">
+                          <div className="basis-2/3 text-primary">{element.name}</div>
+                          <div className="basis-1/3">
+                            <Button variant="destructive"
+                                    size="sm">
+                                add to cart
+                            </Button>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                </li>
-              )
-          })}
-        </ul>
-      </ContentBlock>
+                  </li>
+                )
+            })}
+          </ul>
+        </ContentBlock>
+      </ApolloProvider>
     </div>
   );
 }
