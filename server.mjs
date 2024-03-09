@@ -14,11 +14,16 @@ const typeDefs = `#graphql
       getProductsForCart(findArr: [String]): [Products]
     }
 
+    type Mutation {
+      sendOrder(bodyObj: BodyInput) : Order
+    }
+
     type Products {
       _id: String
       name: String
       price: Int
       category: String
+      amount: Int
     }
 
     type Categories {
@@ -33,6 +38,38 @@ const typeDefs = `#graphql
 
     input FindInput {
       category: String
+    }
+
+    type Order {
+      _id: String
+      user: User
+      products: [Products]
+    }
+
+    type User {
+      name: String
+      email: String
+      phone: String
+      address: String
+    }
+
+    input BodyInput {
+      _id: String!
+      user: UserInput!
+      products: [ProductInput!]!
+    }
+
+    input UserInput {
+      name: String!
+      email: String!
+      phone: String!
+      address: String!
+    }
+
+    input ProductInput {
+      name: String!
+      price: Int!
+      amount: Int!
     }
 `;
 
@@ -56,6 +93,14 @@ const resolvers = {
         const db = client.db('sample_pharmacy');
         const products = await db.collection("products").find(query).toArray();
         return products
+      }
+    },
+    Mutation: {
+      sendOrder: async (_, { bodyObj }) => {
+        const client = await clientPromise;
+        const db = client.db('sample_pharmacy');
+        const products = await db.collection("orders").insertOne(bodyObj);
+        return  bodyObj;
       }
     }
 };

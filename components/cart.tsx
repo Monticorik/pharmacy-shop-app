@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useContext} from "react";
+import React, {useEffect, useState } from "react";
 import { useLazyQuery, gql } from "@apollo/client";
 import { setCartProducts } from "@/lib/features/checkout/checkoutSlice";
 import { setCartStorage } from "@/lib/features/checkout/checkoutSlice";
