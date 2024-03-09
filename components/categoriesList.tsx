@@ -1,11 +1,10 @@
 import React, { useContext } from "react";
 import { useQuery, gql,  } from '@apollo/client';
 import { CategoriesContext } from "@/app/page";
-import { NextUIProvider } from "@nextui-org/react";
 
 import { Button } from "./ui/button";
-import { Spinner } from "@nextui-org/spinner";
-import { AlertCircle } from "lucide-react"
+import Spiner from "./spiner";
+import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 const GET_CATEGORIES_QUERY = gql`
@@ -22,7 +21,6 @@ const CategoriesList = () => {
     const { setCategory } = useContext(CategoriesContext);
 
     return(
-        <NextUIProvider>
             <ul className="flex flex-col gap-5 flex-wrap justify-center">
                 <li key='1'>
                     <Button asChild
@@ -35,7 +33,7 @@ const CategoriesList = () => {
                 </li>
                 
                 {
-                    loading ? <Spinner color="warning" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2" /> :
+                    loading ? <Spiner/> :
                     error ? <Alert variant="destructive" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-80">
                                 <AlertCircle className="h-4 w-4" />
                                 <AlertTitle>Error</AlertTitle>
@@ -59,7 +57,7 @@ const CategoriesList = () => {
                 }
                 
             </ul>
-        </NextUIProvider>
+
     )
 }
 

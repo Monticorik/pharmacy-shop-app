@@ -4,7 +4,6 @@ import { ApolloProvider } from "@apollo/client";
 import client from "@/lib/apolloClient";
 
 import ContentBlock from "@/components/contentBlock";
-import { Button } from "@/components/ui/button";
 import CategoriesList from "@/components/categoriesList";
 import ShopProductsList from "@/components/shopProductsList";
 

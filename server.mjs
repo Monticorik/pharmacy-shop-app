@@ -11,6 +11,7 @@ const typeDefs = `#graphql
     type Query {
       getProducts(sortObj: SortInput, findObj: FindInput): [Products]
       getCategories: [Categories]
+      getProductsForCart(findArr: [String]): [Products]
     }
 
     type Products {
@@ -49,6 +50,13 @@ const resolvers = {
         const categories = await db.collection("categories").find({}).toArray();
         return categories
       },
+      getProductsForCart: async (_, { findArr }) => {
+        const query = {'_id': {$in: [...findArr]}};
+        const client = await clientPromise;
+        const db = client.db('sample_pharmacy');
+        const products = await db.collection("products").find(query).toArray();
+        return products
+      }
     }
 };
 
