@@ -12,7 +12,7 @@ git clone https://github.com/Monticorik/pharmacy-shop-app.git
 
 Next, navigate to the cloned repository and install the dependencies:
 
-# If you are using npm
+### If you are using npm
 ```bash
 npm install
 ```
