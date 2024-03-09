@@ -12,10 +12,17 @@ const typeDefs = `#graphql
       getProducts(sortObj: SortInput, findObj: FindInput): [Products]
       getCategories: [Categories]
       getProductsForCart(findArr: [String]): [Products]
+      getOrders(findArr: [String]): [GetOrder]
     }
 
     type Mutation {
-      sendOrder(bodyObj: BodyInput) : Order
+      sendOrder(bodyObj: BodyInput) : SetOrder
+    }
+
+    type SetOrder {
+      _id: String
+      user: User
+      products: Products
     }
 
     type Products {
@@ -40,7 +47,7 @@ const typeDefs = `#graphql
       category: String
     }
 
-    type Order {
+    type GetOrder {
       _id: String
       user: User
       products: [Products]
@@ -67,6 +74,7 @@ const typeDefs = `#graphql
     }
 
     input ProductInput {
+      _id: String!
       name: String!
       price: Int!
       amount: Int!
@@ -93,13 +101,23 @@ const resolvers = {
         const db = client.db('sample_pharmacy');
         const products = await db.collection("products").find(query).toArray();
         return products
+      },  
+      getOrders: async (_, { findArr }) => {
+        console.log(findArr);
+        const property = 'user.' + findArr[0]
+        const query = {[property]: findArr[1]}
+        console.log(query);
+        const client = await clientPromise;
+        const db = client.db('sample_pharmacy');
+        const orders = await db.collection("orders").find(query).toArray();
+        return orders
       }
     },
     Mutation: {
       sendOrder: async (_, { bodyObj }) => {
         const client = await clientPromise;
         const db = client.db('sample_pharmacy');
-        const products = await db.collection("orders").insertOne(bodyObj);
+        const order = await db.collection("orders").insertOne(bodyObj);
         return  bodyObj;
       }
     }

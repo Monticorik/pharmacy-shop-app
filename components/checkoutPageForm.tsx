@@ -27,6 +27,7 @@ const SEND_ORDER = gql`
                 address
             }
             products {
+                _id
                 name
                 price
                 amount
@@ -52,7 +53,7 @@ const CheckoutPageForm = () => {
         }
         const products = cartProducts.map((element) => {
             const itemAmount = cartStorage.find((e) => e.id === element._id)?.amount;
-            return {name: element.name, price: element.price, amount: itemAmount};
+            return {_id:element._id, name: element.name, price: element.price, amount: itemAmount};
         })
 
         const bodyObj = {_id: id, user, products};

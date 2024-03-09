@@ -31,6 +31,12 @@ export default function RootLayout({
               <li className="text-card-foreground transition hover:scale-110">
                 <Link href="/checkout">Shopping Cart</Link>
               </li>
+              <li className="text-foreground">
+                <span>|</span>
+              </li>
+              <li className="text-card-foreground transition hover:scale-110">
+                <Link href="/history">History</Link>
+              </li>
             </ul>
           </header>
           {children}

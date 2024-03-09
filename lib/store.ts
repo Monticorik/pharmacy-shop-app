@@ -1,11 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit';
-// import monster from './features/monster/monsterSlice';
-// import states from './features/states/stateSlice';
 import products from './features/checkout/checkoutSlice';
+import search from './features/history/historySlice';
 
 export const store = () => {
     return configureStore({
-        reducer: { products },
+        reducer: { products, search },
         middleware: getDefaultMiddleware => getDefaultMiddleware(),
         devTools: process.env.NODE_ENV !== 'production'
     })

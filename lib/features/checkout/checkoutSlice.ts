@@ -21,7 +21,7 @@ const initialState:InityalState = {
     cartStorage: [],
 };
   
-const statesSlice = createSlice({
+const checkoutSlice = createSlice({
     name: 'products',
     initialState,
     reducers: {
@@ -34,7 +34,7 @@ const statesSlice = createSlice({
     },
 })
 
-const {actions, reducer} = statesSlice;
+const {actions, reducer} = checkoutSlice;
 
 export default reducer
 
