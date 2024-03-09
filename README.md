@@ -17,7 +17,7 @@ Next, navigate to the cloned repository and install the dependencies:
 npm install
 ```
 
-# Or if you prefer yarn
+### Or if you prefer yarn
 ```bash
 yarn
 ```
@@ -26,22 +26,22 @@ yarn
 
 To start the development server, run:
 
-# Using npm
+### Using npm
 ```bash
 npm run dev
 ```
 
-# Using yarn
+### Using yarn
 ```bash
 yarn dev
 ```
 
-# Using pnpm
+### Using pnpm
 ```bash
 pnpm dev
 ```
 
-# Using bun
+### Using bun
 ```bash
 bun dev
 ```
