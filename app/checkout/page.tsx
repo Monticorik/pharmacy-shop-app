@@ -1,35 +1,30 @@
 "use client";
 
-import React, {createContext, useState} from "react";
+import React from "react";
 import { ApolloProvider } from "@apollo/client";
 import client from "@/lib/apolloClient";
+import StoreProvider from "@/app/StoreProvider";
 
 import ContentBlock from "@/components/contentBlock";
 import ShippingContent from "@/components/shippingContent";
 import Cart from "@/components/cart";
 import PriceAndSubmit from "@/components/priceAndSubmit";
 
-type Product = {
-    _id: string;
-    name: string;
-    price: number;
-};
-
-export type ProductsContextType = {
-    products: Product[];
-    setProducts: (products: Product[]) => void;
-};
-  
-export const ProductsContext = createContext<ProductsContextType>({
-    products: [],
-    setProducts: ([]) => {},
-});
-
 export default function Checkout() {
-    const [products, setProducts] = useState<Product[]>([]);
+
+    const submitHandler = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        console.log(event);
+        const formData = new FormData(event.currentTarget); 
+
+        for (let [key, value] of formData.entries()) {
+          console.log(key, value);
+        }
+    }
+
     return(
-        <ProductsContext.Provider value={{ products, setProducts }}>
-            <form className="h-15/16 w-full">
+        <StoreProvider>
+            <form className="h-15/16 w-full" onSubmit={(e) => submitHandler(e)}>
                 <div className="flex flex-row flex-nowrap h-4/5 w-full">
                     <ApolloProvider client={client}>
                         <div className="basis-1/2 p-5 h-full">
@@ -46,6 +41,6 @@ export default function Checkout() {
                 </div>
                 <PriceAndSubmit/>
             </form>
-        </ProductsContext.Provider>
+        </StoreProvider>
     )
 }

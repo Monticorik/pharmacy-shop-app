@@ -16,6 +16,11 @@ type Product = {
   category: string;
 };
 
+type Storage = {
+    id: string;
+    amount: number
+}
+
 const GET_PRODUCTS = gql`
   query GetProducts($findObj: FindInput, $sortObj: SortInput) {
     getProducts(findObj: $findObj, sortObj: $sortObj) {
@@ -31,12 +36,14 @@ const ShopProductsList = () => {
     const { category } = useContext(CategoriesContext);
     const [getProducts, { loading, error, data }] = useLazyQuery(GET_PRODUCTS);
     const [sortParam, setSortParam] = useState('');
-    const [cart, setCart] = useState<{[key: string]: {amount: number}}>({});
+    const [cart, setCart] = useState<Storage[]>([]);
 
     const localStorageHadler = (id: string) => {
         const cartJSON = localStorage.getItem('cart');
-        const cart = cartJSON ? JSON.parse(cartJSON) : {}
-        cart[id] ? cart[id].amount++ : cart[id] = {amount: 1};
+        const cart = cartJSON ? JSON.parse(cartJSON) : []
+        const index = cart.findIndex((elem: Storage) => elem.id === id);
+
+        index >= 0 ? cart[index].amount++ : cart.push({id, amount: 1});
 
         setCart(cart);
         localStorage.setItem('cart', JSON.stringify(cart));
@@ -45,14 +52,18 @@ const ShopProductsList = () => {
     const productCounter = (id: string) => {
         return(
             <>
-            {cart[id] ? <Badge className="absolute -top-3 -right-3">{cart[id].amount}</Badge> : null}
+            {
+                cart.map(element => {
+                    return element.id === id ? <Badge className="absolute -top-3 -right-3">{element.amount}</Badge> : null
+                })
+            }
             </>
         ) 
     }
 
     useEffect(() => {
         const cartJSON = localStorage.getItem('cart');
-        setCart(cartJSON ? JSON.parse(cartJSON) : {});
+        setCart(cartJSON ? JSON.parse(cartJSON) : []);
     }, []);
 
     useEffect(() => {

@@ -1,38 +1,29 @@
-import { useState, useContext, useEffect } from "react";
-import { ProductsContext } from "@/app/checkout/page";
+import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 
 import { Button } from "./ui/button";
-import { ChevronsRightLeft } from "lucide-react";
 
-type Product = {
-    _id: string;
-    name: string;
-    price: number;
-};
+import type { RootState } from "@/lib/store";
+
+interface Storage {
+    id: string,
+    amount: number,
+}
 
 const PriceAndSubmit = () => {
+    const cartProducts = useSelector((state: RootState) => state.products.cartProducts);
+    const cartStorage = useSelector((state: RootState) => state.products.cartStorage);
     const [totalPrice, setTotalPrice] = useState(0);
-    const {products} = useContext(ProductsContext);
 
-    const totalPriceCalc = () => {
-        const cartJSON = localStorage.getItem('cart');
-        const cart = cartJSON ? JSON.parse(cartJSON) : {};
-
-        const priceArr = products.map((element: Product) => element.price * cart[element._id].amount);
-        const sum = priceArr.reduce((sum, cur) => sum + cur);
-        setTotalPrice(sum);
-    }
-    
     useEffect(() => {
-        if(products.length) {
-            const cartJSON = localStorage.getItem('cart');
-            const cart = cartJSON ? JSON.parse(cartJSON) : {};
+        const sum = cartProducts.map(product => {
+                const item = cartStorage.find((elem) => elem.id === product._id);
+                const itemAmount = item ? item.amount : 1;
+                return product.price * itemAmount;
+            }).reduce((sum, cur) => sum + cur, 0);
 
-            const priceArr = products.map((element: Product) => element.price * cart[element._id].amount);
-            const sum = priceArr.reduce((sum, cur) => sum + cur);
-            setTotalPrice(sum);
-        }
-    }, [products])
+        setTotalPrice(sum || 0);
+    }, [cartProducts, cartStorage])
 
     return(
         <div className="flex flex-row flex-nowrap gap-5 p-5 justify-end">
@@ -40,7 +31,8 @@ const PriceAndSubmit = () => {
             <div>
                 <Button 
                     variant="destructive"
-                    size="lg">
+                    size="lg"
+                    type="submit">
                     Submit
                 </Button>
             </div>

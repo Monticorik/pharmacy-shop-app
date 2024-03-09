@@ -1,6 +1,8 @@
 import React, {useEffect, useState, useContext} from "react";
 import { useLazyQuery, gql } from "@apollo/client";
-import { ProductsContext } from "@/app/checkout/page";
+import { setCartProducts } from "@/lib/features/checkout/checkoutSlice";
+import { setCartStorage } from "@/lib/features/checkout/checkoutSlice";
+import { useDispatch } from "react-redux";
 
 import { Input } from "./ui/input";
 import Spiner from "./spiner";
@@ -15,8 +17,9 @@ type Product = {
     price: number;
   };
 
-interface Cart {
-    [key: string]: {amount: number},
+interface Storage {
+    id: string,
+    amount: number,
 }
   
 const GET_PRODUCTS_FOR_CART = gql`
@@ -31,36 +34,46 @@ const GET_PRODUCTS_FOR_CART = gql`
 
 const Cart = () => {
     const [getProducts, { loading, error, data }] = useLazyQuery(GET_PRODUCTS_FOR_CART);
-    const { setProducts } = useContext(ProductsContext);
-    const [cart, setCart] = useState<Cart>({});
+    const dispatch = useDispatch();
+    const [cart, setCart] = useState<Storage[]>([]);
 
     const removeProduct = (id: string) => {
-        const cartClone = JSON.parse(JSON.stringify(cart));
-        delete cartClone[id];
+        const filteredCart = cart.filter(element => element.id !== id);
+        
+        localStorage.setItem('cart', JSON.stringify(filteredCart));
+        dispatch(setCartStorage(filteredCart));
+        setCart(filteredCart);
+    }
 
-        localStorage.setItem('cart', JSON.stringify(cartClone));
-        setCart(cartClone);
+    const inputHandler = (event: React.ChangeEvent<HTMLInputElement>, id: string) => {
+        const changedCart = cart.map(element => {
+            let newElement;
+            if(element.id === id){
+                newElement = {...element, amount: +event.target.value}
+            }
+            return newElement || element;
+        });
+         
+        localStorage.setItem('cart', JSON.stringify(changedCart));
+        dispatch(setCartStorage(changedCart));
+        setCart(changedCart)
     }
 
     useEffect(() => {
         const cartJSON = localStorage.getItem('cart');
-        const cart = cartJSON ? JSON.parse(cartJSON) : {};
-        setCart(cart as Cart);
+        const cart = cartJSON ? JSON.parse(cartJSON) : [];
+        dispatch(setCartStorage(cart));
+        setCart(cart);
     }, [])
 
     useEffect(() => {
-        const idArr = [];
-
-        for(let key in cart){
-            idArr.push(key);
-        }
-
+        const idArr = cart.map(element => {return element.id});
         getProducts({variables: {findArr: idArr}});
     }, [cart]);
 
     useEffect(() => {
         if(data){
-            setProducts([...data.getProductsForCart])
+            dispatch(setCartProducts([...data.getProductsForCart]));
         }
     }, [data])
 
@@ -88,11 +101,13 @@ const Cart = () => {
                                         <div className="w-full text-3xl">{element.name}</div>
                                         <div className="w-full">{`Price: ${element.price} UAH`}</div>
                                         <Input 
+                                            className=" w-60 mt-auto"
                                             type="number" 
                                             id="name" 
-                                            defaultValue={cart[element._id]?.amount}
-                                            min={1} 
-                                            className=" w-60 mt-auto"/>
+                                            defaultValue={cart.find(prod => prod.id === element._id)?.amount}
+                                            min={1}
+                                            onChange={(event) => inputHandler(event, element._id)}
+                                            />
                                     </div>
                                     <Button variant="destructive" 
                                             className="h-5 rounded-md px-1 mx-2"
@@ -114,12 +129,3 @@ const Cart = () => {
 }
 
 export default Cart;
-
-<div className=" flex flex-row flex-nowrap w-full h-fit p-5 bg-secondary rounded-xl">
-<div className="min-w-52  min-h-52 bg-muted-foreground"></div>
-<div className="basis-2/3 text-primary flex flex-col flex-wrap text-center items-center">
-    <div className="w-full text-3xl">{'Name'}</div>
-    <div className="w-full">{`Price UAH`}</div>
-    <Input type="number" id="name" defaultValue={1} className=" w-60 mt-auto"/>
-</div>
-</div>
