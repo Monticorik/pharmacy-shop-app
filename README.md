@@ -12,12 +12,12 @@ git clone https://github.com/Monticorik/pharmacy-shop-app.git
 
 Next, navigate to the cloned repository and install the dependencies:
 
-# If you are using npm
+### If you are using npm
 ```bash
 npm install
 ```
 
-# Or if you prefer yarn
+### Or if you prefer yarn
 ```bash
 yarn
 ```
@@ -26,22 +26,22 @@ yarn
 
 To start the development server, run:
 
-# Using npm
+### Using npm
 ```bash
 npm run dev
 ```
 
-# Using yarn
+### Using yarn
 ```bash
 yarn dev
 ```
 
-# Using pnpm
+### Using pnpm
 ```bash
 pnpm dev
 ```
 
-# Using bun
+### Using bun
 ```bash
 bun dev
 ```
