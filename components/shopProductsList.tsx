@@ -15,7 +15,7 @@ type Product = {
   name: string;
   price: number;
   category: string;
-  favourite: boolean;
+  favourite: number;
 };
 
 type Storage = {
@@ -60,12 +60,14 @@ const ShopProductsList = () => {
         
         if(favourite.includes(product._id)){
             const filteredFavourite = favourite.filter(element => element !== product._id);
+            console.log(filteredFavourite);
             setFavourite(filteredFavourite);
-            value = false;
+            value = 0;
         }
         if(!favourite.includes(product._id)){
+            console.log([...favourite, product._id]);
             setFavourite([...favourite, product._id])
-            value = true
+            value = 1
         }
 
         const queryObj = {
@@ -106,7 +108,7 @@ const ShopProductsList = () => {
 
     useEffect(() => {
         const findObj = category ? { category } : {};
-        const sortObj = sortParam ? {"favourite": -1, [sortParam] : 1} : {};
+        const sortObj = sortParam ? {[sortParam] : 1} : {};
         const queryParametrs = {
         variables: {
             findObj,
@@ -115,6 +117,15 @@ const ShopProductsList = () => {
         };
         getProducts(queryParametrs);
     }, [category, sortParam]);
+
+    useEffect(() => {
+        if(data && data.getProducts.length){
+            const favouriteArr = data.getProducts.filter((element: Product)=> element.favourite == 1)
+                                 .map((element: Product)=> element._id);
+            console.log(favouriteArr)
+            setFavourite(favouriteArr);
+        }
+    }, [data])
 
     return (
         <>
@@ -148,7 +159,7 @@ const ShopProductsList = () => {
                         key={element._id}
                     >
                         <div className="bg-secondary p-5 w-fit min-w-64 h-fit min-h-80 relative">
-                            <Button variant={element.favourite || favourite.includes(element._id)  ? "destructive" : "secondary"} 
+                            <Button variant={favourite.includes(element._id)  ? "destructive" : "secondary"} 
                                     className="absolute -top-3 -right-3"
                                     onClick={() => favouriteHandler(element)}>
                                 <Heart/>

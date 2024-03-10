@@ -85,7 +85,7 @@ const typeDefs = `#graphql
 
     input FavouriteInput {
       _id: String
-      favourite: Boolean
+      favourite: Int
     }
 `;
 
@@ -94,8 +94,11 @@ const resolvers = {
       getProducts: async (_, { sortObj, findObj }) => {
         const client = await clientPromise;
         const db = client.db('sample_pharmacy');
-        console.log(sortObj)
-        const products = await db.collection("products").find(findObj).sort(sortObj).toArray();
+        let sort;
+        if(Object.keys(sortObj).length){
+          sort = {"favourite": -1, ...sortObj};
+        }
+        const products = await db.collection("products").find(findObj).sort(sort).toArray();
         return products
       },
       getCategories: async () => {
