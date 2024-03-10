@@ -17,6 +17,7 @@ const typeDefs = `#graphql
 
     type Mutation {
       sendOrder(bodyObj: BodyInput) : SetOrder
+      setFavourite(favouriteObj: FavouriteInput): Products
     }
 
     type SetOrder {
@@ -30,6 +31,7 @@ const typeDefs = `#graphql
       name: String
       price: Int
       category: String
+      favourite: Boolean
       amount: Int
     }
 
@@ -41,6 +43,7 @@ const typeDefs = `#graphql
     input SortInput {
       name: Int
       price: Int
+      favourite: Int
     }
 
     input FindInput {
@@ -79,6 +82,11 @@ const typeDefs = `#graphql
       price: Int!
       amount: Int!
     }
+
+    input FavouriteInput {
+      _id: String
+      favourite: Boolean
+    }
 `;
 
 const resolvers = {
@@ -86,6 +94,7 @@ const resolvers = {
       getProducts: async (_, { sortObj, findObj }) => {
         const client = await clientPromise;
         const db = client.db('sample_pharmacy');
+        console.log(sortObj)
         const products = await db.collection("products").find(findObj).sort(sortObj).toArray();
         return products
       },
@@ -103,10 +112,7 @@ const resolvers = {
         return products
       },  
       getOrders: async (_, { findArr }) => {
-        console.log(findArr);
-        const property = 'user.' + findArr[0]
-        const query = {[property]: findArr[1]}
-        console.log(query);
+        const query = {[`user.${findArr[0]}`]: findArr[1]}
         const client = await clientPromise;
         const db = client.db('sample_pharmacy');
         const orders = await db.collection("orders").find(query).toArray();
@@ -119,6 +125,16 @@ const resolvers = {
         const db = client.db('sample_pharmacy');
         const order = await db.collection("orders").insertOne(bodyObj);
         return  bodyObj;
+      },
+      setFavourite: async (_, { favouriteObj }) => {
+        const client = await clientPromise;
+        const db = client.db('sample_pharmacy');
+        const product = await db.collection("products").findOneAndUpdate(
+                        { "_id" : favouriteObj._id },
+                        { $set: { "favourite" : favouriteObj.favourite } },
+                        {returnNewDocument : true}
+                      );
+        return  product;
       }
     }
 };

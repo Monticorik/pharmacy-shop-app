@@ -3,6 +3,7 @@ import { useLazyQuery, gql } from "@apollo/client";
 import { setCartProducts } from "@/lib/features/checkout/checkoutSlice";
 import { setCartStorage } from "@/lib/features/checkout/checkoutSlice";
 import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 
 import { Input } from "./ui/input";
 import Spiner from "./spiner";
@@ -10,6 +11,8 @@ import { AlertCircle } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "./ui/button";
 import { X } from 'lucide-react';
+
+import type { RootState } from "@/lib/store";
 
 type Product = {
     _id: string;
@@ -36,6 +39,7 @@ const Cart = () => {
     const [getProducts, { loading, error, data }] = useLazyQuery(GET_PRODUCTS_FOR_CART);
     const dispatch = useDispatch();
     const [cart, setCart] = useState<Storage[]>([]);
+    const cartStorage = useSelector((state: RootState) => state.products.cartStorage);
 
     const removeProduct = (id: string) => {
         const filteredCart = cart.filter(element => element.id !== id);
@@ -76,6 +80,12 @@ const Cart = () => {
             dispatch(setCartProducts([...data.getProductsForCart]));
         }
     }, [data])
+
+    useEffect(() => {
+        if(!cartStorage.length){
+            getProducts({variables: {findArr: []}});
+        }
+    }, [cartStorage])
 
     return(
         <div>

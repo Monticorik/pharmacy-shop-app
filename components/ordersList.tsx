@@ -51,7 +51,6 @@ const OrdersList = () => {
 
     useEffect(() => {
         if(findOrderParams.length){
-            console.log(findOrderParams)
             getOrder({variables: {findArr: findOrderParams}});
         }
     }, [findOrderParams])
@@ -96,7 +95,7 @@ const OrdersList = () => {
                                             )
                                         })}
                                     </ul>
-                                    <div className="basis-1/3 p-5 flex flex-col justify-center items-center text-foreground">
+                                    <div className="grow p-5 flex flex-col justify-center items-center text-foreground">
                                         <span>Total Price</span>
                                         <span>{`${element.products.reduce((sum, cur) => sum + (cur.price * cur.amount), 0)} UAH`}</span>
                                     </div>

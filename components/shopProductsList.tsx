@@ -1,5 +1,5 @@
 import React, { useEffect, useContext, useState } from "react";
-import { useLazyQuery, gql } from "@apollo/client";
+import { useLazyQuery, useMutation, gql } from "@apollo/client";
 import { CategoriesContext } from "@/app/page";
 
 import { Button } from "./ui/button";
@@ -8,12 +8,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { AlertCircle } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
+import { Heart } from 'lucide-react';
 
 type Product = {
   _id: string;
   name: string;
   price: number;
   category: string;
+  favourite: boolean;
 };
 
 type Storage = {
@@ -28,15 +30,51 @@ const GET_PRODUCTS = gql`
       name
       price
       category
+      favourite
     }
   }
 `;
 
+const SET_FAVOURITE = gql`
+    mutation SetFavourite($favouriteObj: FavouriteInput) {
+        setFavourite(favouriteObj: $favouriteObj) {
+            _id
+            name
+            price
+            category
+            favourite
+        }
+  }
+`
+
 const ShopProductsList = () => {
     const { category } = useContext(CategoriesContext);
     const [getProducts, { loading, error, data }] = useLazyQuery(GET_PRODUCTS);
+    const [modifyFavourite, {loading: load, error: er, data: dat}] = useMutation(SET_FAVOURITE);
     const [sortParam, setSortParam] = useState('');
     const [cart, setCart] = useState<Storage[]>([]);
+    const [favourite, setFavourite] = useState<string[]>([]);
+
+    const favouriteHandler = (product: Product) => {
+        let value;
+        
+        if(favourite.includes(product._id)){
+            const filteredFavourite = favourite.filter(element => element !== product._id);
+            setFavourite(filteredFavourite);
+            value = false;
+        }
+        if(!favourite.includes(product._id)){
+            setFavourite([...favourite, product._id])
+            value = true
+        }
+
+        const queryObj = {
+            _id: product._id, 
+            favourite: value
+        } 
+
+        modifyFavourite({variables: { favouriteObj : queryObj}});
+    }
 
     const localStorageHadler = (id: string) => {
         const cartJSON = localStorage.getItem('cart');
@@ -68,7 +106,7 @@ const ShopProductsList = () => {
 
     useEffect(() => {
         const findObj = category ? { category } : {};
-        const sortObj = sortParam ? {[sortParam] : 1} : {};
+        const sortObj = sortParam ? {"favourite": -1, [sortParam] : 1} : {};
         const queryParametrs = {
         variables: {
             findObj,
@@ -109,7 +147,12 @@ const ShopProductsList = () => {
                         className="basis-1/3 p-5 flex justify-center "
                         key={element._id}
                     >
-                        <div className="bg-secondary p-5 w-fit min-w-64 h-fit min-h-80">
+                        <div className="bg-secondary p-5 w-fit min-w-64 h-fit min-h-80 relative">
+                            <Button variant={element.favourite || favourite.includes(element._id)  ? "destructive" : "secondary"} 
+                                    className="absolute -top-3 -right-3"
+                                    onClick={() => favouriteHandler(element)}>
+                                <Heart/>
+                            </Button>
                             <div className="w-full min-h-60 bg-muted-foreground mb-5"></div>
                             <div className="flex gap-5 items-center h-1/3">
                                 <div className="basis-2/3 text-primary flex flex-col flex-wrap">
