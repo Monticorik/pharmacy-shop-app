@@ -1,6 +1,6 @@
 # Welcome to My Pharmacy Shop App!
 
-This my test task https://pharmacy-shop-app.vercel.app/checkout I hope you have a great day!
+This my test task https://pharmacy-shop-app.vercel.app/ I hope you have a great day!
 
 ## Installation
 
