@@ -138,7 +138,7 @@ const server = new ApolloServer({
     if (!db) {
       try {
         const dbClient = await client.connect();
-        db = dbClient.db('sample_pharmacy'); // Имя вашей БД
+        db = dbClient.db('sample_pharmacy'); 
       } catch (e) {
         console.error(e);
       }
