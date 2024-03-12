@@ -1,21 +1,14 @@
 "use client";
-import React, { createContext, useState } from "react";
+import React, { useState } from "react";
 import { ApolloProvider } from "@apollo/client";
 import client from "@/lib/apolloClient";
+import { CategoriesContext } from "@/lib/context";
 
 import ContentBlock from "@/components/contentBlock";
 import CategoriesList from "@/components/categoriesList";
 import ShopProductsList from "@/components/shopProductsList";
 
-export type ContextType = {
-  category: string;
-  setCategory: (category: string) => void;
-};
 
-export const CategoriesContext = createContext<ContextType>({
-  category: "",
-  setCategory: () => {},
-});
 
 export default function Home() {
   const [category, setCategory] = useState("");
