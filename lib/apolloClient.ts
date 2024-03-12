@@ -1,7 +1,7 @@
 import { ApolloClient, InMemoryCache, HttpLink } from '@apollo/client';
 
 const httpLink = new HttpLink({
-  uri: 'https://pharmacy-shop-app-server-chi.vercel.app/',
+  uri: 'https://pharmacy-shop-app-server-henna.vercel.app/api/graphql',
 });
 
 const client = new ApolloClient({
