@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { useQuery, gql,  } from '@apollo/client';
-import { CategoriesContext } from "@/app/page";
+import { CategoriesContext } from "@/lib/context";
 
 import { Button } from "./ui/button";
 import Spiner from "./spiner";
