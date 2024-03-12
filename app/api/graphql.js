@@ -1,12 +1,14 @@
-import { ApolloServer } from "@saeris/apollo-server-vercel";
+import { ApolloServer, gql } from 'apollo-server-micro';
 import { MongoClient } from 'mongodb';
 
-const uri = "mongodb+srv://Moskaliuk:FCxsQwMXXJt6Uct7@pharmacy-shop.ixln3xm.mongodb.net/?retryWrites=true&w=majority";
+let db;
 
-const client = new MongoClient(uri);
-const clientPromise = client.connect();
+const client = new MongoClient(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
-const typeDefs = `#graphql
+const typeDefs = gql`
     type Query {
       getProducts(sortObj: SortInput, findObj: FindInput): [Products]
       getCategories: [Categories]
@@ -90,9 +92,7 @@ const typeDefs = `#graphql
 
 const resolvers = {
     Query: {
-      getProducts: async (_, { sortObj, findObj }) => {
-        const client = await clientPromise;
-        const db = client.db('sample_pharmacy');
+      getProducts: async (_, { sortObj, findObj }, { db }) => {
         let sort;
         if(Object.keys(sortObj).length){
           sort = {"favourite": -1, ...sortObj};
@@ -100,37 +100,27 @@ const resolvers = {
         const products = await db.collection("products").find(findObj).sort(sort).toArray();
         return products
       },
-      getCategories: async () => {
-        const client = await clientPromise;
-        const db = client.db('sample_pharmacy');
+      getCategories: async (_, __, { db }) => {
         const categories = await db.collection("categories").find({}).toArray();
         return categories
       },
-      getProductsForCart: async (_, { findArr }) => {
+      getProductsForCart: async (_, { findArr }, { db }) => {
         const query = {'_id': {$in: [...findArr]}};
-        const client = await clientPromise;
-        const db = client.db('sample_pharmacy');
         const products = await db.collection("products").find(query).toArray();
         return products
       },  
-      getOrders: async (_, { findArr }) => {
+      getOrders: async (_, { findArr }, { db }) => {
         const query = {[`user.${findArr[0]}`]: findArr[1]}
-        const client = await clientPromise;
-        const db = client.db('sample_pharmacy');
         const orders = await db.collection("orders").find(query).toArray();
         return orders
       }
     },
     Mutation: {
-      sendOrder: async (_, { bodyObj }) => {
-        const client = await clientPromise;
-        const db = client.db('sample_pharmacy');
+      sendOrder: async (_, { bodyObj }, { db }) => {
         const order = await db.collection("orders").insertOne(bodyObj);
         return  bodyObj;
       },
-      setFavourite: async (_, { favouriteObj }) => {
-        const client = await clientPromise;
-        const db = client.db('sample_pharmacy');
+      setFavourite: async (_, { favouriteObj }, { db }) => {
         const product = await db.collection("products").findOneAndUpdate(
                         { "_id" : favouriteObj._id },
                         { $set: { "favourite" : favouriteObj.favourite } },
@@ -144,8 +134,28 @@ const resolvers = {
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  playground: true,
-  introspection: true
+  async context() {
+    if (!db) {
+      try {
+        const dbClient = await client.connect();
+        db = dbClient.db('sample_pharmacy'); // Имя вашей БД
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    return { db };
+  },
 });
 
-export default server.createHandler();
+const startServer = server.start();
+
+export default async function handler(req, res) {
+  await startServer;
+  await server.createHandler({ path: '/api/graphql' })(req, res);
+}
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
