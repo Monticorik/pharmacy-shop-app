@@ -3,7 +3,9 @@ import { MongoClient } from 'mongodb';
 
 let db;
 
-const client = new MongoClient(process.env.MONGODB_URI, {
+const MONGODB_URI = "mongodb+srv://Moskaliuk:FCxsQwMXXJt6Uct7@pharmacy-shop.ixln3xm.mongodb.net/?retryWrites=true&w=majority"
+
+const client = new MongoClient(MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
@@ -149,13 +151,13 @@ const server = new ApolloServer({
 
 const startServer = server.start();
 
-export default async function handler(req, res) {
-  await startServer;
-  await server.createHandler({ path: '/api/graphql' })(req, res);
-}
-
 export const config = {
   api: {
     bodyParser: false,
   },
 };
+
+export default async function handler(req, res) {
+  await startServer;
+  await server.createHandler({ path: '/api/graphql' })(req, res);
+}
